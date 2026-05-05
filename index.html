@@ -41,7 +41,7 @@
 
   /* ============ TOPBAR ============ */
   .topbar {
-    max-width: 820px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 48px 24px 24px;
     text-align: center;
@@ -71,7 +71,7 @@
 
   /* ============ FORM CARD ============ */
   .form-card {
-    max-width: 820px;
+    max-width: 1000px;
     margin: 24px auto;
     padding: 0 24px;
   }
@@ -153,7 +153,7 @@
     background: #fdfaf3;
     color: #1a1a1a;
     width: 100%;
-    max-width: 820px;
+    max-width: 1000px;
     box-shadow: 0 25px 60px -20px rgba(0,0,0,0.5);
     position: relative;
     font-family: 'Lora', Georgia, serif;
@@ -276,8 +276,8 @@
 
   /* ----- Identitas box ----- */
   .party {
-    margin: 24px 0 28px;
-    padding: 22px 28px;
+    margin: 0;
+    padding: 22px 26px;
     background: #f7f2e6;
     position: relative;
     border-radius: 2px;
@@ -293,12 +293,32 @@
   }
   .party-line {
     display: grid;
-    grid-template-columns: 140px 16px 1fr;
-    font-size: 14.5px;
-    margin-bottom: 6px;
+    grid-template-columns: 130px 14px 1fr;
+    font-size: 13.5px;
+    margin-bottom: 7px;
     line-height: 1.5;
   }
   .party-line:last-of-type { margin-bottom: 0; }
+
+  /* ----- 2-column grid: identitas | pernyataan ----- */
+  .ctr-body-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 36px;
+    margin: 24px 0 32px;
+    align-items: start;
+  }
+  .pernyataan-intro {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: #3d3d3d;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #d4cfc1;
+  }
+  .pernyataan-intro strong { font-style: normal; font-weight: 600; }
   .party-line .lbl {
     color: #6b6b6b;
     font-style: italic;
@@ -312,20 +332,10 @@
     font-weight: 400;
     font-style: italic;
   }
-  .party-role {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px dashed #d4cfc1;
-    font-size: 13.5px;
-    color: #3d3d3d;
-    text-align: justify;
-    line-height: 1.7;
-  }
-  .party-role strong { font-weight: 600; }
 
   /* ----- Pernyataan ----- */
   .pernyataan {
-    margin: 28px 0 36px;
+    margin: 0;
   }
   .pernyataan ol {
     list-style: none;
@@ -335,12 +345,12 @@
   }
   .pernyataan ol li {
     counter-increment: pernyataan;
-    padding-left: 44px;
+    padding-left: 42px;
     position: relative;
-    margin-bottom: 16px;
-    font-size: 14.5px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
     text-align: justify;
-    line-height: 1.8;
+    line-height: 1.7;
     color: #1a1a1a;
   }
   .pernyataan ol li:last-child { margin-bottom: 0; }
@@ -493,6 +503,11 @@
 
   @media (max-width: 720px) {
     .ctr-inner { padding: 40px 28px; }
+    .ctr-body-grid {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      margin: 18px 0 28px;
+    }
     .stamp {
       bottom: 40px;
       left: 30px;
@@ -509,6 +524,11 @@
 
   /* Force desktop layout pas screenshot — override media query mobile */
   .force-desktop .ctr-inner { padding: 56px 64px 64px !important; }
+  .force-desktop .ctr-body-grid {
+    grid-template-columns: 320px 1fr !important;
+    gap: 36px !important;
+    margin: 24px 0 32px !important;
+  }
   .force-desktop .stamp {
     bottom: 76px !important;
     left: 88px !important;
@@ -517,14 +537,14 @@
   }
   .force-desktop .stamp-text { font-size: 10px !important; }
   .force-desktop .stamp-cross { font-size: 22px !important; }
-  .force-desktop .party-line { grid-template-columns: 140px 16px 1fr !important; font-size: 14.5px !important; }
+  .force-desktop .party-line { grid-template-columns: 130px 14px 1fr !important; font-size: 13.5px !important; }
   .force-desktop .hospital-name { font-size: 28px !important; }
   .force-desktop .title-main { font-size: 30px !important; }
   .force-desktop .signature-section { padding-right: 48px !important; justify-content: flex-end !important; }
 
   /* ============ SUBMIT AREA ============ */
   .submit-area {
-    max-width: 820px;
+    max-width: 1000px;
     margin: 0 auto 60px;
     padding: 0 24px;
   }
@@ -685,44 +705,47 @@
       <p class="preamble">
         Pada hari ini, <strong id="c_tanggal">—</strong>, telah dibuat dan ditandatangani
         Surat Pernyataan Persetujuan Kontrak Kerja oleh tenaga medis
-        <span class="c_rs2">Rumah Sakit Garuda Prime</span> dengan identitas sebagai berikut:
+        <span class="c_rs2">Rumah Sakit Garuda Prime</span>, dengan identitas anggota
+        beserta butir-butir pernyataan sebagai berikut:
       </p>
 
-      <div class="party">
-        <div class="party-line"><span class="lbl">Nama Lengkap</span><span>:</span><span class="val" id="c_nama" data-empty>—</span></div>
-        <div class="party-line"><span class="lbl">Tempat/Tgl Lahir</span><span>:</span><span class="val" id="c_ttl" data-empty>—</span></div>
-        <div class="party-line"><span class="lbl">Nomor Telepon</span><span>:</span><span class="val" id="c_nohp" data-empty>—</span></div>
-        <div class="party-line"><span class="lbl">CID</span><span>:</span><span class="val" id="c_cid" data-empty>—</span></div>
-        <div class="party-line"><span class="lbl">Jabatan Saat Ini</span><span>:</span><span class="val" id="c_jabatan" data-empty>—</span></div>
-        <div class="party-role">
-          Yang selanjutnya disebut sebagai <strong>ANGGOTA</strong>, dengan ini secara sadar
-          dan tanpa paksaan dari pihak manapun menyatakan hal-hal sebagai berikut:
+      <div class="ctr-body-grid">
+        <div class="party">
+          <div class="party-line"><span class="lbl">Nama Lengkap</span><span>:</span><span class="val" id="c_nama" data-empty>—</span></div>
+          <div class="party-line"><span class="lbl">Tempat/Tgl Lahir</span><span>:</span><span class="val" id="c_ttl" data-empty>—</span></div>
+          <div class="party-line"><span class="lbl">Nomor Telepon</span><span>:</span><span class="val" id="c_nohp" data-empty>—</span></div>
+          <div class="party-line"><span class="lbl">CID</span><span>:</span><span class="val" id="c_cid" data-empty>—</span></div>
+          <div class="party-line"><span class="lbl">Jabatan Saat Ini</span><span>:</span><span class="val" id="c_jabatan" data-empty>—</span></div>
         </div>
-      </div>
 
-      <div class="pernyataan">
-        <ol>
-          <li>
-            Telah <strong>membaca, memahami, dan menyetujui</strong> seluruh isi Kontrak Kerja
-            serta Standar Operasional Prosedur (SOP) Tenaga Medis
-            <span class="c_rs2">Rumah Sakit Garuda Prime</span> yang telah disosialisasikan
-            melalui channel resmi.
-          </li>
-          <li>
-            Bersedia <strong>mematuhi seluruh ketentuan</strong> yang berlaku, termasuk
-            sanksi disipliner berjenjang (SP, SP-1, SP-2, SP-3), mekanisme pengunduran diri
-            (resign), serta ketentuan pensiun.
-          </li>
-          <li>
-            <strong>Melepaskan hak untuk menuntut</strong>
-            <span class="c_rs2">Rumah Sakit Garuda Prime</span> atas pemberlakuan sanksi
-            maupun denda yang telah disepakati dalam kontrak dan SOP.
-          </li>
-          <li>
-            Pernyataan ini dibuat dalam keadaan <strong>sehat jasmani-rohani</strong>,
-            dan memiliki kekuatan hukum yang sah serta mengikat.
-          </li>
-        </ol>
+        <div class="pernyataan">
+          <div class="pernyataan-intro">
+            Yang selanjutnya disebut sebagai <strong>ANGGOTA</strong>, dengan ini secara
+            sadar dan tanpa paksaan dari pihak manapun menyatakan:
+          </div>
+          <ol>
+            <li>
+              Telah <strong>membaca, memahami, dan menyetujui</strong> seluruh isi Kontrak Kerja
+              serta Standar Operasional Prosedur (SOP) Tenaga Medis
+              <span class="c_rs2">Rumah Sakit Garuda Prime</span> yang telah disosialisasikan
+              melalui channel resmi.
+            </li>
+            <li>
+              Bersedia <strong>mematuhi seluruh ketentuan</strong> yang berlaku, termasuk
+              sanksi disipliner berjenjang (SP, SP-1, SP-2, SP-3), mekanisme pengunduran diri
+              (resign), serta ketentuan pensiun.
+            </li>
+            <li>
+              <strong>Melepaskan hak untuk menuntut</strong>
+              <span class="c_rs2">Rumah Sakit Garuda Prime</span> atas pemberlakuan sanksi
+              maupun denda yang telah disepakati dalam kontrak dan SOP.
+            </li>
+            <li>
+              Pernyataan ini dibuat dalam keadaan <strong>sehat jasmani-rohani</strong>,
+              dan memiliki kekuatan hukum yang sah serta mengikat.
+            </li>
+          </ol>
+        </div>
       </div>
 
       <div class="signature-section">
@@ -899,7 +922,7 @@
       document.body.classList.add('capturing');
 
       // FORCE DESKTOP WIDTH untuk screenshot — biar konsisten apapun device-nya
-      // Clone kontrak ke offscreen container dengan lebar fixed 820px
+      // Clone kontrak ke offscreen container dengan lebar fixed 1000px
       const original = $('contractEl');
       const clone = original.cloneNode(true);
       clone.classList.add('force-desktop'); // override media query mobile
@@ -908,14 +931,14 @@
         position: fixed;
         top: 0;
         left: -9999px;
-        width: 820px;
+        width: 1000px;
         background: #fdfaf3;
         z-index: -1;
         pointer-events: none;
       `;
       clone.style.cssText = `
-        width: 820px !important;
-        max-width: 820px !important;
+        width: 1000px !important;
+        max-width: 1000px !important;
         margin: 0 !important;
         box-shadow: none !important;
       `;
@@ -933,8 +956,8 @@
           scale: 2,
           useCORS: true,
           logging: false,
-          width: 820,
-          windowWidth: 820
+          width: 1000,
+          windowWidth: 1000
         });
       } finally {
         // Cleanup clone
