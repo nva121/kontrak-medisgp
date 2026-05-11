@@ -38,14 +38,19 @@ export default async function handler(req, res) {
     }
     const cleanDiscordId = discordId.toString().trim();
 
-    // Tanggal hari ini (format DD/MM/YYYY)
-    const t = new Date();
-    const wibOffset = 7 * 60; // Asia/Jakarta UTC+7
-    const localTime = new Date(t.getTime() + (t.getTimezoneOffset() + wibOffset) * 60000);
-    const dd = String(localTime.getDate()).padStart(2, '0');
-    const mm = String(localTime.getMonth() + 1).padStart(2, '0');
-    const yyyy = localTime.getFullYear();
-    const today = `${dd}/${mm}/${yyyy}`;
+    // Tanggal hari ini (WIB) — format: "Senin, 11/05/2026"
+    const now = new Date();
+    const hari = now.toLocaleDateString('id-ID', {
+      weekday: 'long',
+      timeZone: 'Asia/Jakarta'
+    });
+    const dmy = now.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'Asia/Jakarta'
+    }); // en-GB → "11/05/2026"
+    const today = `${hari}, ${dmy}`;
 
     // === Compose text per tipe (plain text, no markdown) ===
     let title, body;
