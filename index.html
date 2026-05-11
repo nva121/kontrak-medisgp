@@ -756,6 +756,45 @@
     letter-spacing: 0.05em;
   }
 
+  /* Reset action buttons (muncul setelah berhasil kirim) */
+  .sp-reset-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .btn-reset {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 11px 18px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .btn-reset-partial {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+  .btn-reset-partial:hover {
+    background: var(--gold-bright);
+    border-color: var(--gold-bright);
+  }
+  .btn-reset-all {
+    color: var(--text-mute);
+  }
+  .btn-reset-all:hover {
+    color: #ff8a8a;
+    border-color: #ff8a8a;
+  }
+
   .sp-preview-label {
     font-family: var(--mono);
     font-size: 10px;
@@ -1092,6 +1131,10 @@
         Pesan akan dikirim ke <strong>channel Discord Surat Peringatan</strong>. Pastikan data sudah benar sebelum mengirim — pesan yang sudah terkirim tidak dapat ditarik kembali.
       </div>
       <button type="button" class="primary" id="spSubmitBtn" disabled>Kirim Surat Peringatan</button>
+      <div class="sp-reset-actions" id="spResetActions" style="display:none;">
+        <button type="button" class="btn-reset btn-reset-partial" id="spResetPartial">Kirim Lagi ke Anggota Lain</button>
+        <button type="button" class="btn-reset btn-reset-all" id="spResetAll">Reset Semua Field</button>
+      </div>
       <div class="status info" id="spStatus"></div>
     </div>
   </section>
@@ -1570,6 +1613,43 @@ ${np}`;
   });
 
   // SP submit
+  // Field-field anggota (yang biasanya diganti tiap kirim ulang)
+  const spAnggotaFields = ['sp_namaA', 'sp_jabatanA', 'sp_discordId', 'sp_alasan'];
+
+  function resetSpForm(partial) {
+    // partial=true → cuma reset field anggota
+    // partial=false → reset semua field
+    const targets = partial ? spAnggotaFields : spFields;
+    targets.forEach(id => {
+      const el = $(id);
+      if (el) el.value = '';
+    });
+    // Re-enable semua field (kalau sebelumnya di-disable)
+    spFields.forEach(id => {
+      const el = $(id);
+      if (el) el.disabled = false;
+    });
+
+    // Reset submit button + hide reset actions
+    const btn = $('spSubmitBtn');
+    btn.textContent = 'Kirim Surat Peringatan';
+    btn.style.display = '';
+    $('spResetActions').style.display = 'none';
+    $('spStatus').textContent = '';
+    $('spStatus').className = 'status info';
+
+    updateSpPreview();
+
+    // Focus ke field pertama yang kosong
+    const firstEmpty = (partial ? spAnggotaFields : spFields).map(id => $(id)).find(el => el && !el.value);
+    if (firstEmpty && typeof firstEmpty.focus === 'function') {
+      setTimeout(() => firstEmpty.focus(), 100);
+    }
+  }
+
+  $('spResetPartial').addEventListener('click', () => resetSpForm(true));
+  $('spResetAll').addEventListener('click', () => resetSpForm(false));
+
   $('spSubmitBtn').addEventListener('click', async () => {
     if (!currentSpType) return;
     const btn = $('spSubmitBtn');
@@ -1593,9 +1673,10 @@ ${np}`;
 
       status.textContent = '✓ Surat peringatan berhasil dikirim ke channel Discord.';
       status.className = 'status success';
-      btn.textContent = 'Terkirim';
-      // Disable form
-      spFields.forEach(id => { const e = $(id); if (e) e.disabled = true; });
+
+      // Sembunyikan tombol Kirim, tampilkan tombol reset
+      btn.style.display = 'none';
+      $('spResetActions').style.display = 'flex';
     } catch (e) {
       console.error(e);
       status.textContent = '✗ Gagal mengirim: ' + (e.message || 'Unknown error');
