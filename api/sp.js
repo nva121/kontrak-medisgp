@@ -52,14 +52,13 @@ export default async function handler(req, res) {
     }); // en-GB → "11/05/2026"
     const today = `${hari}, ${dmy}`;
 
-    // === Compose text per tipe (plain text, no markdown) ===
+    // === Compose text per tipe (plain text, no markdown di body) ===
     let title, body;
 
     if (type === 'sp1') {
       title = 'SURAT PERINGATAN KE 1';
       body =
-`SURAT PERINGATAN KE 1
-Tanggal : ${today}
+`Tanggal : ${today}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
@@ -82,8 +81,7 @@ ${namaP}`;
     else if (type === 'sp2') {
       title = 'SURAT PERINGATAN KE 2';
       body =
-`SURAT PERINGATAN KE 2
-Tanggal : ${today}
+`Tanggal : ${today}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
@@ -104,10 +102,9 @@ ${namaP}`;
     }
 
     else { // sp3
-      title = 'SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SP-3';
+      title = 'SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3';
       body =
-`SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3
-Tanggal : ${today}
+`Tanggal : ${today}
 
 Dengan Hormat,
 Saya yang bertanda tangan di bawah ini :
@@ -129,9 +126,13 @@ Regards,
 ${namaP}`;
     }
 
-    // Wrap surat di code block (jadi dark box style di Discord),
-    // lalu mention di luar code block (biar nge-ping + render @nickname)
-    const content = `\`\`\`\n${body}\n\`\`\`\n<@${cleanDiscordId}>`;
+    // Struktur Discord:
+    // ## TITLE         ← heading, render gede
+    // ```              ← code block dimulai
+    // body             ← surat plain text
+    // ```              ← code block selesai
+    // <@id>            ← mention, render @nickname + nge-ping
+    const content = `## ${title}\n\`\`\`\n${body}\n\`\`\`\n<@${cleanDiscordId}>`;
 
     const payload = {
       content,
