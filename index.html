@@ -703,6 +703,15 @@
     margin: 16px auto;
     padding: 0 24px;
   }
+  .sp-preview-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    padding: 2px 4px;
+    line-height: 1.25;
+  }
   .sp-preview-codeblock {
     background: #1e1f22;
     border: 1px solid #2b2d31;
@@ -1043,6 +1052,7 @@
 
   <div class="sp-preview">
     <div class="sp-preview-label">Pratinjau pesan yang akan dikirim ke Discord:</div>
+    <div class="sp-preview-title" id="sp_preview_title">—</div>
     <div class="sp-preview-codeblock" id="sp_preview">—</div>
     <div class="sp-preview-mention-row" id="sp_preview_mention_row" style="display:none;">
       <span class="sp-mention" id="sp_preview_mention">@—</span>
@@ -1429,11 +1439,11 @@
     const ja = d.jabatanA || '...';
     const al = d.alasan || '...';
 
-    let body;
+    let title, body;
 
     if (type === 'sp1') {
-      body = `SURAT PERINGATAN KE 1
-Tanggal : ${tgl}
+      title = 'SURAT PERINGATAN KE 1';
+      body = `Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
@@ -1453,8 +1463,8 @@ Regards,
 ${np}`;
     }
     else if (type === 'sp2') {
-      body = `SURAT PERINGATAN KE 2
-Tanggal : ${tgl}
+      title = 'SURAT PERINGATAN KE 2';
+      body = `Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
@@ -1474,8 +1484,8 @@ Regards,
 ${np}`;
     }
     else { // sp3
-      body = `SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3
-Tanggal : ${tgl}
+      title = 'SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3';
+      body = `Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan di bawah ini :
@@ -1497,7 +1507,7 @@ Regards,
 ${np}`;
     }
 
-    return body;
+    return { title, body };
   }
 
   // Render preview: plain text (escape HTML)
@@ -1508,8 +1518,10 @@ ${np}`;
   function updateSpPreview() {
     if (!currentSpType) return;
     const data = getSpData();
-    const text = composeSp(currentSpType, data);
-    $('sp_preview').innerHTML = renderSpPreview(text);
+    const { title, body } = composeSp(currentSpType, data);
+
+    $('sp_preview_title').textContent = title;
+    $('sp_preview').innerHTML = renderSpPreview(body);
 
     // Render mention separately (di bawah code block)
     const mentionRow = $('sp_preview_mention_row');
