@@ -1024,7 +1024,20 @@
         </div>
         <div class="field">
           <label>Jabatan Pimpinan</label>
-          <input id="sp_jabatanP" type="text" placeholder="Contoh: Direktur Utama" autocomplete="off">
+          <select id="sp_jabatanP">
+            <option value="">— Pilih Jabatan —</option>
+            <option value="Direktur">Direktur</option>
+            <option value="Wakil Direktur">Wakil Direktur</option>
+            <option value="Sekben">Sekben</option>
+            <option value="RnD">RnD</option>
+            <option value="Komdis">Komdis</option>
+            <option value="HRD">HRD</option>
+            <option value="Specialist">Specialist</option>
+            <option value="Farmasi">Farmasi</option>
+            <option value="Dokter">Dokter</option>
+            <option value="Co.Ass">Co.Ass</option>
+            <option value="Perawat">Perawat</option>
+          </select>
         </div>
       </div>
 
@@ -1036,7 +1049,20 @@
         </div>
         <div class="field">
           <label>Jabatan Anggota</label>
-          <input id="sp_jabatanA" type="text" placeholder="Contoh: Dokter Umum" autocomplete="off">
+          <select id="sp_jabatanA">
+            <option value="">— Pilih Jabatan —</option>
+            <option value="Direktur">Direktur</option>
+            <option value="Wakil Direktur">Wakil Direktur</option>
+            <option value="Sekben">Sekben</option>
+            <option value="RnD">RnD</option>
+            <option value="Komdis">Komdis</option>
+            <option value="HRD">HRD</option>
+            <option value="Specialist">Specialist</option>
+            <option value="Farmasi">Farmasi</option>
+            <option value="Dokter">Dokter</option>
+            <option value="Co.Ass">Co.Ass</option>
+            <option value="Perawat">Perawat</option>
+          </select>
         </div>
         <div class="field full">
           <label>Discord ID Anggota <span style="font-weight:400; text-transform:none; letter-spacing:0; opacity:0.7;">(klik kanan user di Discord → Copy User ID)</span></label>
@@ -1535,10 +1561,12 @@ ${np}`;
     $('spSubmitBtn').disabled = !spAllFilled();
   }
 
-  // Attach listeners ke field SP
+  // Attach listeners ke field SP (input untuk text/textarea, change untuk select)
   spFields.forEach(id => {
     const el = $(id);
-    if (el) el.addEventListener('input', updateSpPreview);
+    if (!el) return;
+    el.addEventListener('input', updateSpPreview);
+    el.addEventListener('change', updateSpPreview);
   });
 
   // SP submit
