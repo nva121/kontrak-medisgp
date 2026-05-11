@@ -703,29 +703,49 @@
     margin: 16px auto;
     padding: 0 24px;
   }
-  .sp-preview-inner {
-    background: #36302a;
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--gold);
+  .sp-preview-codeblock {
+    background: #1e1f22;
+    border: 1px solid #2b2d31;
     border-radius: 4px;
-    padding: 24px 28px;
-    font-family: var(--serif);
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text);
+    border-left: 4px solid var(--gold);
+    padding: 18px 22px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #dbdee1;
     white-space: pre-wrap;
     word-wrap: break-word;
+    overflow-x: auto;
   }
-  .sp-preview-inner strong {
-    color: var(--gold-bright);
-    font-weight: 600;
+  .sp-preview-codeblock.sp-yellow { border-left-color: #eab308; }
+  .sp-preview-codeblock.sp-orange { border-left-color: #f97316; }
+  .sp-preview-codeblock.sp-red { border-left-color: #ef4444; }
+
+  .sp-preview-mention-row {
+    margin-top: 10px;
+    padding: 6px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
   }
-  .sp-preview-inner.sp-yellow { border-left-color: #eab308; }
-  .sp-preview-inner.sp-yellow strong { color: #fde047; }
-  .sp-preview-inner.sp-orange { border-left-color: #f97316; }
-  .sp-preview-inner.sp-orange strong { color: #fdba74; }
-  .sp-preview-inner.sp-red { border-left-color: #ef4444; }
-  .sp-preview-inner.sp-red strong { color: #fca5a5; }
+  .sp-mention {
+    display: inline-block;
+    background: rgba(88, 101, 242, 0.25);
+    color: #c7d2fe;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: var(--serif);
+    font-size: 13.5px;
+  }
+  .sp-mention-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-mute);
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+  }
 
   .sp-preview-label {
     font-family: var(--mono);
@@ -1010,6 +1030,10 @@
           <input id="sp_jabatanA" type="text" placeholder="Contoh: Dokter Umum" autocomplete="off">
         </div>
         <div class="field full">
+          <label>Discord ID Anggota <span style="font-weight:400; text-transform:none; letter-spacing:0; opacity:0.7;">(klik kanan user di Discord → Copy User ID)</span></label>
+          <input id="sp_discordId" type="text" placeholder="Contoh: 123456789012345678" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+        </div>
+        <div class="field full">
           <label>Alasan / Pelanggaran</label>
           <textarea id="sp_alasan" placeholder="Jelaskan pelanggaran SOP yang dilakukan..."></textarea>
         </div>
@@ -1019,7 +1043,11 @@
 
   <div class="sp-preview">
     <div class="sp-preview-label">Pratinjau pesan yang akan dikirim ke Discord:</div>
-    <div class="sp-preview-inner" id="sp_preview">—</div>
+    <div class="sp-preview-codeblock" id="sp_preview">—</div>
+    <div class="sp-preview-mention-row" id="sp_preview_mention_row" style="display:none;">
+      <span class="sp-mention" id="sp_preview_mention">@—</span>
+      <span class="sp-mention-hint">Discord akan menampilkan nickname asli anggota di server</span>
+    </div>
   </div>
 
   <section class="submit-area">
@@ -1352,7 +1380,7 @@
     $('sp_eyebrow').textContent = cfg.eyebrow;
     $('sp_eyebrow').className = 'sp-eyebrow ' + cfg.eyebrowClass;
     $('sp_sub').textContent = cfg.sub;
-    $('sp_preview').className = 'sp-preview-inner ' + cfg.color;
+    $('sp_preview').className = 'sp-preview-codeblock ' + cfg.color;
 
     // Update switcher active state
     document.querySelectorAll('.sp-switcher a').forEach(a => {
@@ -1363,7 +1391,7 @@
   }
 
   // ============ SP FORM LOGIC ============
-  const spFields = ['sp_namaP', 'sp_jabatanP', 'sp_namaA', 'sp_jabatanA', 'sp_alasan'];
+  const spFields = ['sp_namaP', 'sp_jabatanP', 'sp_namaA', 'sp_jabatanA', 'sp_discordId', 'sp_alasan'];
 
   function getSpData() {
     return {
@@ -1371,19 +1399,25 @@
       jabatanP: $('sp_jabatanP').value.trim(),
       namaA: $('sp_namaA').value.trim(),
       jabatanA: $('sp_jabatanA').value.trim(),
+      discordId: $('sp_discordId').value.trim(),
       alasan: $('sp_alasan').value.trim()
     };
   }
 
   function spAllFilled() {
     const d = getSpData();
-    return d.namaP && d.jabatanP && d.namaA && d.jabatanA && d.alasan;
+    if (!d.namaP || !d.jabatanP || !d.namaA || !d.jabatanA || !d.alasan) return false;
+    // Discord ID harus angka 16-20 digit (Discord snowflake)
+    if (!/^\d{16,20}$/.test(d.discordId)) return false;
+    return true;
   }
 
   function todayStrId() {
-    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
     const t = new Date();
-    return `${t.getDate()} ${months[t.getMonth()]} ${t.getFullYear()}`;
+    const dd = String(t.getDate()).padStart(2, '0');
+    const mm = String(t.getMonth() + 1).padStart(2, '0');
+    const yyyy = t.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   }
 
   function composeSp(type, d) {
@@ -1394,72 +1428,80 @@
     const ja = d.jabatanA || '...';
     const al = d.alasan || '...';
 
+    let body;
+
     if (type === 'sp1') {
-      return `**SURAT PERINGATAN KE 1**
-**Tanggal :** ${tgl}
+      body = `SURAT PERINGATAN KE 1
+Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
-**Nama** : ${np}
-**Jabatan** : ${jp}
+
+Nama         : ${np}
+Jabatan      : ${jp}
 
 Medis yang di sebutkan di bawah ini telah MELANGGAR SOP yang sudah berlaku, saya berlakukan surat peringatan 1 terhadap tenaga medis dibawah ini :
-**Nama** : ${na}
-**Jabatan** : ${ja}
-**Alasan** : ${al}
+
+Nama         : ${na}
+Jabatan      : ${ja}
+Alasan       : ${al}
 
 Demikian Surat Peringatan 1 ini saya sampaikan. Apabila masih ditemukan pelanggaran SOP dalam kurun waktu yang ditentukan, maka akan diberlakukan tindakan tegas berupa Surat Peringatan 2 ataupun 3. Terima kasih.
 
 Regards,
-**( ${np} )**`;
+${np}`;
     }
-    if (type === 'sp2') {
-      return `**SURAT PERINGATAN KE 2**
-**Tanggal :** ${tgl}
+    else if (type === 'sp2') {
+      body = `SURAT PERINGATAN KE 2
+Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan dibawah ini :
-**Nama** : ${np}
-**Jabatan** : ${jp}
+
+Nama         : ${np}
+Jabatan      : ${jp}
 
 Medis yang di sebutkan di bawah ini telah MELANGGAR SOP yang sudah berlaku, saya berlakukan surat peringatan 2 terhadap tenaga medis dibawah ini :
-**Nama** : ${na}
-**Jabatan** : ${ja}
-**Alasan** : ${al}
+
+Nama         : ${na}
+Jabatan      : ${ja}
+Alasan       : ${al}
 
 Demikian Surat Peringatan 2 ini saya sampaikan. Apabila masih ditemukan pelanggaran SOP dalam kurun waktu yang ditentukan, maka akan diberlakukan tindakan tegas berupa Surat Peringatan 3. Terima kasih.
 
 Regards,
-**( ${np} )**`;
+${np}`;
     }
-    // sp3
-    return `**SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3**
-**Tanggal :** ${tgl}
+    else { // sp3
+      body = `SURAT PEMBERHENTIAN TIDAK DENGAN HORMAT (PTDH) / SURAT PERINGATAN KE 3
+Tanggal : ${tgl}
 
 Dengan Hormat,
 Saya yang bertanda tangan di bawah ini :
-**Nama** : ${np}
-**Jabatan** : ${jp}
+
+Nama         : ${np}
+Jabatan      : ${jp}
 
 Dengan ini menyatakan bahwa tenaga medis yang disebutkan di bawah ini telah melakukan pelanggaran SOP secara berulang dan/atau tidak menunjukkan perbaikan setelah diberikan Surat Peringatan sebelumnya. Oleh karena itu, diberikan Surat Peringatan ke-3 sekaligus Pemberhentian Tidak Dengan Hormat (PTDH) kepada :
-**Nama** : ${na}
-**Jabatan** : ${ja}
-**Alasan** : ${al}
+
+Nama         : ${na}
+Jabatan      : ${ja}
+Alasan       : ${al}
 
 Diwajibkan untuk ybs segera kerumah sakit untuk mengembalikan kendaraan beserta alat medis dan membayar denda PTDH, jika tidak membayar denda PTDH maka ybs akan diblacklist dari seluruh instansi.
 
 Keputusan ini bersifat final. Terhitung sejak tanggal ditetapkan, yang bersangkutan tidak lagi menjadi bagian dari instansi medis.
 
 Regards,
-**( ${np} )**`;
+${np}`;
+    }
+
+    return body;
   }
 
-  // Render preview with **bold** → <strong>
+  // Render preview: plain text (escape HTML)
   function renderSpPreview(text) {
-    // Escape HTML first
-    const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    // Convert **xxx** to <strong>xxx</strong>
-    return esc.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function updateSpPreview() {
@@ -1467,6 +1509,16 @@ Regards,
     const data = getSpData();
     const text = composeSp(currentSpType, data);
     $('sp_preview').innerHTML = renderSpPreview(text);
+
+    // Render mention separately (di bawah code block)
+    const mentionRow = $('sp_preview_mention_row');
+    if (data.discordId && /^\d{16,20}$/.test(data.discordId)) {
+      $('sp_preview_mention').textContent = '@' + data.discordId;
+      mentionRow.style.display = 'flex';
+    } else {
+      mentionRow.style.display = 'none';
+    }
+
     $('spSubmitBtn').disabled = !spAllFilled();
   }
 
