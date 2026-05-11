@@ -1132,8 +1132,7 @@
       </div>
       <button type="button" class="primary" id="spSubmitBtn" disabled>Kirim Surat Peringatan</button>
       <div class="sp-reset-actions" id="spResetActions" style="display:none;">
-        <button type="button" class="btn-reset btn-reset-partial" id="spResetPartial">Kirim Lagi ke Anggota Lain</button>
-        <button type="button" class="btn-reset btn-reset-all" id="spResetAll">Reset Semua Field</button>
+        <button type="button" class="btn-reset btn-reset-partial" id="spResetBtn">Kirim Lagi</button>
       </div>
       <div class="status info" id="spStatus"></div>
     </div>
@@ -1613,21 +1612,13 @@ ${np}`;
   });
 
   // SP submit
-  // Field-field anggota (yang biasanya diganti tiap kirim ulang)
-  const spAnggotaFields = ['sp_namaA', 'sp_jabatanA', 'sp_discordId', 'sp_alasan'];
-
-  function resetSpForm(partial) {
-    // partial=true → cuma reset field anggota
-    // partial=false → reset semua field
-    const targets = partial ? spAnggotaFields : spFields;
-    targets.forEach(id => {
-      const el = $(id);
-      if (el) el.value = '';
-    });
-    // Re-enable semua field (kalau sebelumnya di-disable)
+  function resetSpForm() {
+    // Reset semua field KECUALI Discord ID (biar tinggal pakai ulang)
     spFields.forEach(id => {
       const el = $(id);
-      if (el) el.disabled = false;
+      if (!el) return;
+      el.disabled = false;
+      if (id !== 'sp_discordId') el.value = '';
     });
 
     // Reset submit button + hide reset actions
@@ -1641,14 +1632,13 @@ ${np}`;
     updateSpPreview();
 
     // Focus ke field pertama yang kosong
-    const firstEmpty = (partial ? spAnggotaFields : spFields).map(id => $(id)).find(el => el && !el.value);
+    const firstEmpty = spFields.map(id => $(id)).find(el => el && !el.value);
     if (firstEmpty && typeof firstEmpty.focus === 'function') {
       setTimeout(() => firstEmpty.focus(), 100);
     }
   }
 
-  $('spResetPartial').addEventListener('click', () => resetSpForm(true));
-  $('spResetAll').addEventListener('click', () => resetSpForm(false));
+  $('spResetBtn').addEventListener('click', resetSpForm);
 
   $('spSubmitBtn').addEventListener('click', async () => {
     if (!currentSpType) return;
